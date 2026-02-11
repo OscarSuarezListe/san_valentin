@@ -61,7 +61,7 @@ function heartShape(t) {
 
 // Centro del corazón (más abajo)
 const heartCenterX = canvas.width / 2;
-const heartCenterY = canvas.height * 0.65; // 🔥 más abajo
+const heartCenterY = canvas.height * 0.75; // 🔥 más abajo
 
 for (let i = 0; i < Math.PI * 2; i += 0.05) {
   let pos = heartShape(i);
@@ -71,6 +71,7 @@ for (let i = 0; i < Math.PI * 2; i += 0.05) {
     y: heartCenterY - pos.y * 15  // 🔥 aquí va RESTANDO
   });
 }
+create TextTargets("TE AMO" , canvas.height*0.25);
 /* =====================
    🚀 CREAR PARTÍCULAS DESDE CAÑÓN
 ===================== */
