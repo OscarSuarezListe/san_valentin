@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  background: radial-gradient(circle, #1a0033, #000);
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+h1 {
+  position: absolute;
+  top: 20%;
+  width: 100%;
+  text-align: center;
+  color: #ff4d6d;
+  font-size: 3rem;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
