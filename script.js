@@ -71,7 +71,7 @@ for (let i = 0; i < Math.PI * 2; i += 0.05) {
     y: heartCenterY - pos.y * 15  // 🔥 aquí va RESTANDO
   });
 }
-create TextTargets("TE AMO" , canvas.height*0.25);
+create TextTargets("TE AMO" , canvas.height * 0.25);
 /* =====================
    🚀 CREAR PARTÍCULAS DESDE CAÑÓN
 ===================== */
