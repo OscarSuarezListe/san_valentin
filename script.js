@@ -5,12 +5,12 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let stars = [];
-let heartParticles = [];
+let particles = [];
+let targets = [];
 
-/* =========================
-   🌌 CREAR ESTRELLAS
-========================= */
-
+/* =====================
+   🌌 ESTRELLAS
+===================== */
 for (let i = 0; i < 200; i++) {
   stars.push({
     x: Math.random() * canvas.width,
@@ -20,11 +20,37 @@ for (let i = 0; i < 200; i++) {
   });
 }
 
-/* =========================
-   💖 FUNCIÓN CORAZÓN
-========================= */
+/* =====================
+   💘 GENERAR FORMA TEXTO
+===================== */
+function createTextTargets(text, yOffset) {
+  const tempCanvas = document.createElement("canvas");
+  const tempCtx = tempCanvas.getContext("2d");
 
-function heart(t) {
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+
+  tempCtx.fillStyle = "white";
+  tempCtx.font = "bold 120px Arial";
+  tempCtx.textAlign = "center";
+  tempCtx.fillText(text, canvas.width / 2, yOffset);
+
+  const data = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
+
+  for (let y = 0; y < canvas.height; y += 8) {
+    for (let x = 0; x < canvas.width; x += 8) {
+      const index = (y * canvas.width + x) * 4;
+      if (data.data[index + 3] > 128) {
+        targets.push({ x, y });
+      }
+    }
+  }
+}
+
+/* =====================
+   💖 GENERAR CORAZÓN GRANDE
+===================== */
+function heartShape(t) {
   let x = 16 * Math.pow(Math.sin(t), 3);
   let y = 13 * Math.cos(t)
         - 5 * Math.cos(2 * t)
@@ -33,32 +59,48 @@ function heart(t) {
   return { x, y };
 }
 
-/* =========================
-   💘 CREAR PARTÍCULAS CORAZÓN
-========================= */
-
 for (let i = 0; i < Math.PI * 2; i += 0.05) {
-  let pos = heart(i);
-
-  heartParticles.push({
-    baseX: canvas.width / 2 + pos.x * 15,
-    baseY: canvas.height / 2 - pos.y * 15,
-    size: Math.random() * 2 + 1,
-    offset: Math.random() * 100
+  let pos = heartShape(i);
+  targets.push({
+    x: canvas.width / 2 + pos.x * 15,
+    y: canvas.height / 2 + pos.y * 15
   });
 }
 
-/* =========================
+createTextTargets("TE AMO", canvas.height * 0.25);
+
+/* =====================
+   🚀 CREAR PARTÍCULAS DESDE CAÑÓN
+===================== */
+
+function createParticle(target) {
+  const cannonX = canvas.width - 80;
+  const cannonY = canvas.height - 80;
+
+  return {
+    x: cannonX,
+    y: cannonY,
+    targetX: target.x,
+    targetY: target.y,
+    size: 16,
+    speed: Math.random() * 2 + 2
+  };
+}
+
+targets.forEach(t => {
+  particles.push(createParticle(t));
+});
+
+/* =====================
    🎬 ANIMACIÓN
-========================= */
+===================== */
 
-function animate(time) {
+function animate() {
 
-  // Fondo oscuro
-  ctx.fillStyle = "rgba(0, 0, 30, 0.4)";
+  ctx.fillStyle = "rgba(0,0,30,0.4)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  /* 🌌 Dibujar estrellas */
+  // 🌌 Estrellas
   stars.forEach(star => {
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
@@ -66,24 +108,32 @@ function animate(time) {
     ctx.fill();
 
     star.y += star.speed;
-
     if (star.y > canvas.height) {
       star.y = 0;
       star.x = Math.random() * canvas.width;
     }
   });
 
-  /* 💖 Dibujar corazón */
-  heartParticles.forEach(p => {
-    let pulse = Math.sin(time * 0.005 + p.offset) * 5;
+  // 🚀 Dibujar cañón
+  ctx.fillStyle = "#888";
+  ctx.fillRect(canvas.width - 90, canvas.height - 60, 60, 20);
 
-    ctx.beginPath();
-    ctx.arc(p.baseX, p.baseY + pulse, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = "#ff4d6d";
-    ctx.fill();
+  // 💘 Partículas ❤️
+  particles.forEach(p => {
+    let dx = p.targetX - p.x;
+    let dy = p.targetY - p.y;
+    let dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > 1) {
+      p.x += dx / dist * p.speed;
+      p.y += dy / dist * p.speed;
+    }
+
+    ctx.font = p.size + "px Arial";
+    ctx.fillText("❤️", p.x, p.y);
   });
 
   requestAnimationFrame(animate);
 }
 
-animate(0);
+animate();
